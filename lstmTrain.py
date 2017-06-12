@@ -13,8 +13,8 @@ import tensorflow as tf
 from dataTraitor import DataTrainSet
 import numpy
 
-pathName = "E:\\bigData\\dsjtzs_txfz_training.txt"
-pathNameT = "E:\\bigData\\dsjtzs_txfz_test1.txt"
+pathName = "D:\\bigData\\dsjtzs_txfz_training.txt"
+pathNameT = "D:\\bigData\\dsjtzs_txfz_test1.txt"
 
 # set random seed for comparing the two result calculations
 tf.set_random_seed(1)

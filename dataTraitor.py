@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy
 from mlxtend.preprocessing import one_hot
+import math
 
 
 class DataTrainSet(object):
@@ -11,12 +12,15 @@ class DataTrainSet(object):
     @property
     def images_humain(self):
         return self._images_humain
+
     @property
     def images_robot(self):
         return self._images_robot
+
     @property
     def num_examples_humain(self):
         return self._num_examples_humain
+
     @property
     def num_examples_robot(self):
         return self._num_examples_robot
@@ -40,8 +44,8 @@ class DataTrainSet(object):
     def next_batch_train(self, batch_size):
         start_humain = self._index_in_epoch_humain
         start_robot = self._index_in_epoch_robot
-        self._index_in_epoch_humain += int(batch_size/2)
-        self._index_in_epoch_robot += int(batch_size/2)
+        self._index_in_epoch_humain += int(batch_size / 2)
+        self._index_in_epoch_robot += int(batch_size / 2)
         if self._index_in_epoch_humain > self._num_examples_humain:
             # Shuffle the data
             perm = [i for i in range(self._num_examples_humain)]
@@ -49,7 +53,7 @@ class DataTrainSet(object):
             self._images_humain = self._images_humain[perm]
             # Start next epoch
             start_humain = 0
-            self._index_in_epoch_humain = int(batch_size/2)
+            self._index_in_epoch_humain = int(batch_size / 2)
             assert batch_size <= self._num_examples_humain
         if self._index_in_epoch_robot > self._num_examples_robot:
             # Shuffle the data
@@ -58,20 +62,20 @@ class DataTrainSet(object):
             self._images_robot = self._images_robot[perm]
             # Start next epoch
             start_robot = 0
-            self._index_in_epoch_robot = int(batch_size/2)
+            self._index_in_epoch_robot = int(batch_size / 2)
             assert batch_size <= self._num_examples_robot
         end_humain = self._index_in_epoch_humain
         end_robot = self._index_in_epoch_robot
-        train_data = numpy.concatenate((self._images_humain[start_humain:end_humain],self._images_robot[start_robot:end_robot]),axis=0)
-        label_data_tem1 = [1 for i in range(end_humain-start_humain)]
-        label_data_tem2 = [0 for i in range(end_robot-start_robot)]
+        train_data = numpy.concatenate((self._images_humain[start_humain:end_humain], self._images_robot[start_robot:end_robot]), axis=0)
+        label_data_tem1 = [1 for i in range(end_humain - start_humain)]
+        label_data_tem2 = [0 for i in range(end_robot - start_robot)]
         label_data_tem1.extend(label_data_tem2)
         label_data = one_hot(label_data_tem1)
         perm_data = [i for i in range(len(train_data))]
         numpy.random.shuffle(perm_data)
         train_data = train_data[perm_data]
         label_data = label_data[perm_data]
-        return train_data,label_data
+        return train_data, label_data
 
     def next_batch_test(self, batch_size):
         start = self._test_index_in_epoch
@@ -99,6 +103,9 @@ class DataTrainSet(object):
             line = f.readline()
             myList = line.split(" ")
             if len(myList) == 3:
+                final_point_str = myList[2].split(",")
+                final_x = float(final_point_str[0])
+                final_y = float(final_point_str[1])
                 myList2 = myList[1].split(";")
                 myList2 = myList2[:len(myList2) - 1]
                 if(maxColone < len(myList2)):
@@ -107,6 +114,12 @@ class DataTrainSet(object):
                 for subMyList2 in myList2:
                     listTemp = subMyList2.split(",")
                     listTemp = list(map(float, listTemp))
+                    x_minus = math.fabs(listTemp[0]-final_x)
+                    y_minus = math.fabs(listTemp[1]-final_y)
+                    lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                    listTemp.append(x_minus)
+                    listTemp.append(y_minus)
+                    listTemp.append(lenthsPoint)
                     myList2Tem.append(listTemp)
                 listData.append(myList2Tem)
         f.close()
@@ -132,6 +145,9 @@ class DataTrainSet(object):
             line = f.readline()
             myList = line.split(" ")
             if len(myList) == 4:
+                final_point_str = myList[2].split(",")
+                final_x = float(final_point_str[0])
+                final_y = float(final_point_str[1])
                 myList2 = myList[1].split(";")
                 myList2 = myList2[:len(myList2) - 1]
                 if(maxColone < len(myList2)):
@@ -140,10 +156,16 @@ class DataTrainSet(object):
                 for subMyList2 in myList2:
                     listTemp = subMyList2.split(",")
                     listTemp = list(map(float, listTemp))
+                    x_minus = math.fabs(listTemp[0]-final_x)
+                    y_minus = math.fabs(listTemp[1]-final_y)
+                    lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                    listTemp.append(x_minus)
+                    listTemp.append(y_minus)
+                    listTemp.append(lenthsPoint)
                     myList2Tem.append(listTemp)
-                if int(myList[3][0])==1:
+                if int(myList[3][0]) == 1:
                     listData_humain.append(myList2Tem)
-                elif int(myList[3][0])==0:
+                elif int(myList[3][0]) == 0:
                     listData_robot.append(myList2Tem)
         f.close()
         # print (max(listMax))
