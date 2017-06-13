@@ -4,10 +4,116 @@ from mlxtend.preprocessing import one_hot
 import math
 
 
+def parseTestData(pathName):
+    f = open(pathName, 'r')
+    listData = []
+    line = True
+    maxColone = 0
+    while line:
+        line = f.readline()
+        myList = line.split(" ")
+        if len(myList) == 3:
+            final_point_str = myList[2].split(",")
+            final_x = float(final_point_str[0])
+            final_y = float(final_point_str[1])
+            myList2 = myList[1].split(";")
+            myList2 = myList2[:len(myList2) - 1]
+            if(maxColone < len(myList2)):
+                maxColone = len(myList2)
+            myList2Tem = []
+            for subMyList2 in myList2:
+                listTemp = subMyList2.split(",")
+                listTemp = list(map(float, listTemp))
+                x_minus = math.fabs(listTemp[0]-final_x)
+                y_minus = math.fabs(listTemp[1]-final_y)
+                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                listTemp.append(x_minus)
+                listTemp.append(y_minus)
+                listTemp.append(lenthsPoint)
+                myList2Tem.append(listTemp)
+            listData.append(myList2Tem)
+    f.close()
+    return maxColone,listData
+
+def parseTrainData(pathName):
+    f = open(pathName, 'r')
+    labels_humain = []
+    labels_robot = []
+    listData_humain = []
+    listData_robot = []
+    line = True
+    maxColone = 0
+    while line:
+        line = f.readline()
+        myList = line.split(" ")
+        if len(myList) == 4:
+            final_point_str = myList[2].split(",")
+            final_x = float(final_point_str[0])
+            final_y = float(final_point_str[1])
+            myList2 = myList[1].split(";")
+            myList2 = myList2[:len(myList2) - 1]
+            if(maxColone < len(myList2)):
+                maxColone = len(myList2)
+            myList2Tem = []
+            for subMyList2 in myList2:
+                listTemp = subMyList2.split(",")
+                listTemp = list(map(float, listTemp))
+                x_minus = math.fabs(listTemp[0]-final_x)
+                y_minus = math.fabs(listTemp[1]-final_y)
+                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                listTemp.append(x_minus)
+                listTemp.append(y_minus)
+                listTemp.append(lenthsPoint)
+                myList2Tem.append(listTemp)
+            if int(myList[3][0]) == 1:
+                listData_humain.append(myList2Tem)
+            elif int(myList[3][0]) == 0:
+                listData_robot.append(myList2Tem)
+    f.close()
+    return maxColone,listData_humain,listData_robot
+
+def getTestData(pathName):
+    maxColone,listData = parseTestData(pathName)
+    # print (max(listMax))
+    for onelist in listData:
+        dataFill = onelist[-1]
+        listFill = [dataFill for i in range(maxColone - len(onelist))]
+        onelist.extend(listFill)
+    return listData
+
+
+def getTrainData(pathName):
+    maxColone,listData_humain,listData_robot = parseTrainData(pathName)
+    # print (max(listMax))
+    for onelist in listData_humain:
+        dataFill = onelist[-1]
+        listFill = [dataFill for i in range(maxColone - len(onelist))]
+        onelist.extend(listFill)
+    for onelist in listData_robot:
+        dataFill = onelist[-1]
+        listFill = [dataFill for i in range(maxColone - len(onelist))]
+        onelist.extend(listFill)
+    return listData_humain,listData_robot
+
+
+
 class DataTrainSet(object):
     def __init__(self, pathNameTrain, pathNameTest):
-        self.getTrainData(pathNameTrain)
-        self.getTestData(pathNameTest)
+        # initialise trainData
+        listData_humain,listData_robot = getTrainData(pathNameTrain)
+        self._images_humain = numpy.array(listData_humain)
+        self._images_robot = numpy.array(listData_robot)
+        self._num_examples_humain = len(listData_humain)
+        self._num_examples_robot = len(listData_robot)
+        self._epochs_completed = 0
+        self._index_in_epoch_humain = 0
+        self._index_in_epoch_robot = 0
+        #initialise testData
+        listData = getTestData(pathNameTest)
+        self._test_images = numpy.array(listData)
+        self._test_num_examples = len(listData)
+        self._test_epochs_completed = 0
+        self._test_index_in_epoch = 0
 
     @property
     def images_humain(self):
@@ -94,93 +200,6 @@ class DataTrainSet(object):
         end = self._test_index_in_epoch
         return numpy.array(self._test_images[start:end])
 
-    def getTestData(self, pathName):
-        f = open(pathName, 'r')
-        listData = []
-        line = True
-        maxColone = 0
-        while line:
-            line = f.readline()
-            myList = line.split(" ")
-            if len(myList) == 3:
-                final_point_str = myList[2].split(",")
-                final_x = float(final_point_str[0])
-                final_y = float(final_point_str[1])
-                myList2 = myList[1].split(";")
-                myList2 = myList2[:len(myList2) - 1]
-                if(maxColone < len(myList2)):
-                    maxColone = len(myList2)
-                myList2Tem = []
-                for subMyList2 in myList2:
-                    listTemp = subMyList2.split(",")
-                    listTemp = list(map(float, listTemp))
-                    x_minus = math.fabs(listTemp[0]-final_x)
-                    y_minus = math.fabs(listTemp[1]-final_y)
-                    lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
-                    listTemp.append(x_minus)
-                    listTemp.append(y_minus)
-                    listTemp.append(lenthsPoint)
-                    myList2Tem.append(listTemp)
-                listData.append(myList2Tem)
-        f.close()
-        # print (max(listMax))
-        for onelist in listData:
-            dataFill = onelist[-1]
-            listFill = [dataFill for i in range(maxColone - len(onelist))]
-            onelist.extend(listFill)
-        self._test_images = numpy.array(listData)
-        self._test_num_examples = len(listData)
-        self._test_epochs_completed = 0
-        self._test_index_in_epoch = 0
 
-    def getTrainData(self, pathName):
-        f = open(pathName, 'r')
-        labels_humain = []
-        labels_robot = []
-        listData_humain = []
-        listData_robot = []
-        line = True
-        maxColone = 0
-        while line:
-            line = f.readline()
-            myList = line.split(" ")
-            if len(myList) == 4:
-                final_point_str = myList[2].split(",")
-                final_x = float(final_point_str[0])
-                final_y = float(final_point_str[1])
-                myList2 = myList[1].split(";")
-                myList2 = myList2[:len(myList2) - 1]
-                if(maxColone < len(myList2)):
-                    maxColone = len(myList2)
-                myList2Tem = []
-                for subMyList2 in myList2:
-                    listTemp = subMyList2.split(",")
-                    listTemp = list(map(float, listTemp))
-                    x_minus = math.fabs(listTemp[0]-final_x)
-                    y_minus = math.fabs(listTemp[1]-final_y)
-                    lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
-                    listTemp.append(x_minus)
-                    listTemp.append(y_minus)
-                    listTemp.append(lenthsPoint)
-                    myList2Tem.append(listTemp)
-                if int(myList[3][0]) == 1:
-                    listData_humain.append(myList2Tem)
-                elif int(myList[3][0]) == 0:
-                    listData_robot.append(myList2Tem)
-        f.close()
-        # print (max(listMax))
-        for onelist in listData_humain:
-            dataFill = onelist[-1]
-            listFill = [dataFill for i in range(maxColone - len(onelist))]
-            onelist.extend(listFill)
-        for onelist in listData_robot:
-            dataFill = onelist[-1]
-            listFill = [dataFill for i in range(maxColone - len(onelist))]
-            onelist.extend(listFill)
-        self._images_humain = numpy.array(listData_humain)
-        self._images_robot = numpy.array(listData_robot)
-        self._num_examples_humain = len(listData_humain)
-        self._num_examples_robot = len(listData_robot)
-        self._epochs_completed = 0
-        self._index_in_epoch_humain = 0
-        self._index_in_epoch_robot = 0
+
+

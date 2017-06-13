@@ -27,7 +27,7 @@ lr = 0.001
 training_iters = 100000
 batch_size = 100
 
-n_inputs = 3   # MNIST data input (img shape: 28*28)
+n_inputs = 6   # MNIST data input (img shape: 28*28)
 n_steps = 300    # time steps
 n_hidden_units = 100   # neurons in hidden layer
 n_classes = 2      # MNIST classes (0-2 digits)
