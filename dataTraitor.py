@@ -24,12 +24,12 @@ def parseTestData(pathName):
             for subMyList2 in myList2:
                 listTemp = subMyList2.split(",")
                 listTemp = list(map(float, listTemp))
-                x_minus = math.fabs(listTemp[0]-final_x)
-                y_minus = math.fabs(listTemp[1]-final_y)
-                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
-                listTemp.append(x_minus)
-                listTemp.append(y_minus)
-                listTemp.append(lenthsPoint)
+                # x_minus = math.fabs(listTemp[0]-final_x)
+                # y_minus = math.fabs(listTemp[1]-final_y)
+                # lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                # listTemp.append(x_minus)
+                # listTemp.append(y_minus)
+                # listTemp.append(lenthsPoint)
                 myList2Tem.append(listTemp)
             listData.append(myList2Tem)
     f.close()
@@ -41,6 +41,8 @@ def parseTrainData(pathName):
     labels_robot = []
     listData_humain = []
     listData_robot = []
+    listData_humain_time = []
+    listData_robot_time = []
     line = True
     maxColone = 0
     while line:
@@ -55,22 +57,29 @@ def parseTrainData(pathName):
             if(maxColone < len(myList2)):
                 maxColone = len(myList2)
             myList2Tem = []
+            myList2Tem_time = []
             for subMyList2 in myList2:
+                appendList = []
                 listTemp = subMyList2.split(",")
                 listTemp = list(map(float, listTemp))
-                x_minus = math.fabs(listTemp[0]-final_x)
-                y_minus = math.fabs(listTemp[1]-final_y)
-                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
-                listTemp.append(x_minus)
-                listTemp.append(y_minus)
-                listTemp.append(lenthsPoint)
-                myList2Tem.append(listTemp)
+                # x_minus = math.fabs(listTemp[0]-final_x)
+                # y_minus = math.fabs(listTemp[1]-final_y)
+                # lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                # listTemp.append(x_minus)
+                # listTemp.append(y_minus)
+                # listTemp.append(lenthsPoint)
+                appendList.append(listTemp[0])
+                appendList.append(listTemp[1])
+                myList2Tem.append(appendList)
+                myList2Tem_time.append(listTemp[2])
             if int(myList[3][0]) == 1:
                 listData_humain.append(myList2Tem)
+                listData_humain_time.append(myList2Tem_time)
             elif int(myList[3][0]) == 0:
                 listData_robot.append(myList2Tem)
+                listData_robot_time.append(myList2Tem_time)
     f.close()
-    return maxColone,listData_humain,listData_robot
+    return maxColone,listData_humain,listData_robot,listData_humain_time,listData_robot_time
 
 def getTestData(pathName):
     maxColone,listData = parseTestData(pathName)
@@ -96,8 +105,7 @@ def getTrainData(pathName):
     return listData_humain,listData_robot
 
 
-
-class DataTrainSet(object):
+class DataSet(object):
     def __init__(self, pathNameTrain, pathNameTest):
         # initialise trainData
         listData_humain,listData_robot = getTrainData(pathNameTrain)
