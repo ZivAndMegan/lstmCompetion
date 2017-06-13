@@ -38,15 +38,42 @@ def speedAnalyse_total(listData_point,listData_time):
             print ("错误数据Time:",i) 
     return totalSpeed
 
+def speedAnalyse_split(listData_point,listData_time):
+    listLenth = []
+    listTime = []
+    listSpeed = []
+    for i in range(len(listData_point)):
+        speed_split = []
+        pre_data = listData_point[0]
+        pre_time = listData_time[0][0]
+        for j in range(len(listData_point[i])):
+            cha = numpy.subtract(listData_point[i][j],pre_data)
+            pingfang = numpy.square(cha)
+            lenth = math.sqrt(numpy.sum(pingfang))
+            speed = lenth/((listData_time[i][j]-pre_time)+0.0001)
+            pre_data = listData_point[i][j]
+            pre_time = listData_time[i][j]
+            speed_split.append(speed)
+        listSpeed.append(speed_split[1:])
+    return listSpeed
+    
 
-resultSpeed_humain = speedAnalyse_total(listData_humain,listData_humain_time)
-resultSpeed_robot = speedAnalyse_total(listData_robot,listData_robot_time)
-print(len(resultSpeed_humain))
-print(len(resultSpeed_robot))
-print ("人类速度平均：",numpy.mean(resultSpeed_humain))
-print ("人类速度中位数：",numpy.median(resultSpeed_humain))
-print ("人类速度众数：",mode(resultSpeed_humain))
-print ("机器速度平均：",numpy.mean(resultSpeed_robot))
-print ("机器速度中位数：",numpy.median(resultSpeed_robot))
-print ("机器速度众数：",mode(resultSpeed_robot))
+
+# resultSpeed_humain = speedAnalyse_total(listData_humain,listData_humain_time)
+# resultSpeed_robot = speedAnalyse_total(listData_robot,listData_robot_time)
+# print(len(resultSpeed_humain))
+# print(len(resultSpeed_robot))
+# print ("人类速度平均：",numpy.mean(resultSpeed_humain))
+# print ("人类速度中位数：",numpy.median(resultSpeed_humain))
+# print ("人类速度众数：",mode(resultSpeed_humain))
+# print ("机器速度平均：",numpy.mean(resultSpeed_robot))
+# print ("机器速度中位数：",numpy.median(resultSpeed_robot))
+# print ("机器速度众数：",mode(resultSpeed_robot))
+
+resultSpeed_humain_split = speedAnalyse_split(listData_humain,listData_humain_time)
+list_Speed_split_max = []
+for i in range(len(resultSpeed_humain_split)):
+    if(len(resultSpeed_humain_split[i])>0):
+        list_Speed_split_max.append(numpy.max(resultSpeed_humain_split[i]))
+print(list_Speed_split_max)
      
