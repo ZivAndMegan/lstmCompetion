@@ -215,11 +215,63 @@ def analyse_num_userful():
     print ("机器移动的有效的次数为:",result_useful_robot.count(1))
     print ("机器移动的无效的次数为:",result_useful_robot.count(0))
     print ("机器移动的有效次数比例为:",result_useful_robot.count(1)/len(result_useful_robot))
-    ###
+    ###分段统计
+
+def analyse_bias_util(listData_point,lenthToFinal):
+    listBias = []
+    for i in range(len(listData_point)):
+        Ystart_minus = lenthToFinal[i][0][1]
+        Xstart_minus = lenthToFinal[i][0][0]
+        percent = Ystart_minus/Xstart_minus
+        Ystart = listData_point[i][0][1]
+        Xstart = listData_point[i][0][0]
+        bias = 0
+        for j in range(len(listData_point[i])):
+            num = 0
+            bias_tem = 0
+            for k in range(j):
+                minus = ((listData_point[i][j][0]-Xstart)*percent+Ystart)-listData_point[i][j][1]
+                minus_pingfang = minus*minus
+                bias_tem = bias_tem+minus_pingfang
+            bias = bias+math.sqrt(bias_tem)
+        listBias.append(bias/len(listData_point[i]))
+    return listBias
     
 
+
+def analyse_bias():
+    num_list = [0 for i in range(5)]
+    result_humain_bias_list = analyse_bias_util(listData_humain,lenthToFinal_humain)
+    for one_data in result_humain_bias_list:
+        if one_data>30000:
+            num_list[0] = num_list[0]+1
+        elif one_data>20000:
+            num_list[1] = num_list[1]+1
+        elif one_data>10000:
+            num_list[2] = num_list[2]+1
+        elif one_data>5000:
+            num_list[3] = num_list[3]+1
+        else:
+            num_list[4] = num_list[4]+1
+    print("人类移动的每条轨迹的bias >30000,20000-30000,10000-20000,5000-10000,<5000,",num_list)
+    num_list = [0 for i in range(5)]
+    result_robot_bias_list = analyse_bias_util(listData_robot,lenthToFinal_robot)
+    for one_data in result_robot_bias_list:
+        if one_data>30000:
+            num_list[0] = num_list[0]+1
+        elif one_data>20000:
+            num_list[1] = num_list[1]+1
+        elif one_data>10000:
+            num_list[2] = num_list[2]+1
+        elif one_data>5000:
+            num_list[3] = num_list[3]+1
+        else:
+            num_list[4] = num_list[4]+1
+    print("机器移动的每条轨迹的bias >30000,20000-30000,10000-20000,5000-10000,<5000,",num_list)
+    print("机器移动的每条轨迹的bias，按比例放大后 >30000,20000-30000,10000-20000,5000-10000,<5000,",numpy.array(num_list)*(2600/400))
 
 
 
 # analyse_track()
-analyse_num_userful()
+# analyse_num_userful()
+analyse_bias()
