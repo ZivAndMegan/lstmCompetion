@@ -194,19 +194,32 @@ def analyse_num_userful_util(list_lenth_data):
         list_userful.append(one_userful_list)
     return list_userful
 
+def flatten_utile(list_complex_2):
+    list_flatten = []
+    for one_data_list in list_complex_2:
+        for everyData in one_data_list:
+            list_flatten.append(everyData)
+    return list_flatten
 
 def analyse_num_userful():
     result_useful = analyse_num_userful_util(lenthToFinal_humain)
-    result_useful = numpy.array(result_useful)
-    
-    print (result_useful)
+    # print (result_useful)
+    result_useful = flatten_utile(result_useful)
     print ("人移动的有效的次数为:",result_useful.count(1))
     print ("人移动的无效的次数为:",result_useful.count(0))
     print ("人移动的有效次数比例为:",result_useful.count(1)/len(result_useful))
-
+    ###
     result_useful_robot = analyse_num_userful_util(lenthToFinal_robot)
+    print(result_useful_robot)
+    result_useful_robot = flatten_utile(result_useful_robot)
     print ("机器移动的有效的次数为:",result_useful_robot.count(1))
     print ("机器移动的无效的次数为:",result_useful_robot.count(0))
-    print ("机器移动的有效次数比例为:",result_useful_robot.count(1)/len(result_useful))    
+    print ("机器移动的有效次数比例为:",result_useful_robot.count(1)/len(result_useful_robot))
+    ###
+    
+
+
+
+
 # analyse_track()
 analyse_num_userful()
