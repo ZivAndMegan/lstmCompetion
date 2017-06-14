@@ -1,14 +1,16 @@
 # 1、鼠标移动速度，平均及整体？
 # 2、轨迹范围？，是否一直在向目标靠近？下一步和上一步的关系？（有效移动比例？）
 # 3、移动数量？
-import dataTraitor
 import math
+
 import numpy
 from scipy.stats import mode
 
+import dataTraitor
+
 pathName = "D:\\bigData\\dsjtzs_txfz_training.txt"
 
-maxColone,listData_humain,listData_robot,listData_humain_time,listData_robot_time = dataTraitor.parseTrainData(pathName)
+maxColone,listData_humain,listData_robot,listData_humain_time,listData_robot_time,lenthToFinal_humain,lenthToFinal_robot = dataTraitor.parseTrainData(pathName)
 listData_humain = numpy.array(listData_humain)
 listData_robot = numpy.array(listData_robot)
 
@@ -178,9 +180,33 @@ def analyse_track():
     print ("机器移动的横坐标范围的>1500,1000-1500,500-1000,<500:", numpy.array(scope_result_x)*(2600/400))
     print ("机器移动的纵坐标范围的>1500,1000-1500,500-1000,<500:", numpy.array(scope_result_y)*(2600/400))
 
+def analyse_num_userful_util(list_lenth_data):
+    list_userful = []
+    for one_data_list in list_lenth_data:
+        perLenth = 99999999
+        one_userful_list = []
+        for one_data in one_data_list:
+            if one_data[2]<perLenth:
+                one_userful_list.append(1)
+            else:
+                one_userful_list.append(0)
+            perLenth = one_data[2]
+        list_userful.append(one_userful_list)
+    return list_userful
 
 
-analyse_track()
+def analyse_num_userful():
+    result_useful = analyse_num_userful_util(lenthToFinal_humain)
+    result_useful = numpy.array(result_useful)
+    
+    print (result_useful)
+    print ("人移动的有效的次数为:",result_useful.count(1))
+    print ("人移动的无效的次数为:",result_useful.count(0))
+    print ("人移动的有效次数比例为:",result_useful.count(1)/len(result_useful))
 
-
-     
+    result_useful_robot = analyse_num_userful_util(lenthToFinal_robot)
+    print ("机器移动的有效的次数为:",result_useful_robot.count(1))
+    print ("机器移动的无效的次数为:",result_useful_robot.count(0))
+    print ("机器移动的有效次数比例为:",result_useful_robot.count(1)/len(result_useful))    
+# analyse_track()
+analyse_num_userful()

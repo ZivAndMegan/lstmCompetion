@@ -7,6 +7,7 @@ import math
 def parseTestData(pathName):
     f = open(pathName, 'r')
     listData = []
+    lenthToFinal = []
     line = True
     maxColone = 0
     while line:
@@ -21,17 +22,20 @@ def parseTestData(pathName):
             if(maxColone < len(myList2)):
                 maxColone = len(myList2)
             myList2Tem = []
+            lenthTem = []
             for subMyList2 in myList2:
                 listTemp = subMyList2.split(",")
                 listTemp = list(map(float, listTemp))
-                # x_minus = math.fabs(listTemp[0]-final_x)
-                # y_minus = math.fabs(listTemp[1]-final_y)
-                # lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                x_minus = math.fabs(listTemp[0]-final_x)
+                y_minus = math.fabs(listTemp[1]-final_y)
+                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                lenthTem.append([x_minus,y_minus,lenthsPoint])
                 # listTemp.append(x_minus)
                 # listTemp.append(y_minus)
                 # listTemp.append(lenthsPoint)
                 myList2Tem.append(listTemp)
             listData.append(myList2Tem)
+            lenthToFinal.append(lenthTem)
     f.close()
     return maxColone,listData
 
@@ -43,6 +47,8 @@ def parseTrainData(pathName):
     listData_robot = []
     listData_humain_time = []
     listData_robot_time = []
+    lenthToFinal_humain = []
+    lenthToFinal_robot = []
     line = True
     maxColone = 0
     while line:
@@ -58,16 +64,15 @@ def parseTrainData(pathName):
                 maxColone = len(myList2)
             myList2Tem = []
             myList2Tem_time = []
+            lenthTem = []
             for subMyList2 in myList2:
                 appendList = []
                 listTemp = subMyList2.split(",")
                 listTemp = list(map(float, listTemp))
-                # x_minus = math.fabs(listTemp[0]-final_x)
-                # y_minus = math.fabs(listTemp[1]-final_y)
-                # lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
-                # listTemp.append(x_minus)
-                # listTemp.append(y_minus)
-                # listTemp.append(lenthsPoint)
+                x_minus = math.fabs(listTemp[0]-final_x)
+                y_minus = math.fabs(listTemp[1]-final_y)
+                lenthsPoint = math.sqrt(x_minus*x_minus+y_minus*y_minus)
+                lenthTem.append([x_minus,y_minus,lenthsPoint])
                 appendList.append(listTemp[0])
                 appendList.append(listTemp[1])
                 myList2Tem.append(appendList)
@@ -75,11 +80,13 @@ def parseTrainData(pathName):
             if int(myList[3][0]) == 1:
                 listData_humain.append(myList2Tem)
                 listData_humain_time.append(myList2Tem_time)
+                lenthToFinal_humain.append(lenthTem)
             elif int(myList[3][0]) == 0:
                 listData_robot.append(myList2Tem)
                 listData_robot_time.append(myList2Tem_time)
+                lenthToFinal_robot.append(lenthTem)
     f.close()
-    return maxColone,listData_humain,listData_robot,listData_humain_time,listData_robot_time
+    return maxColone,listData_humain,listData_robot,listData_humain_time,listData_robot_time,lenthToFinal_humain,lenthToFinal_robot
 
 def getTestData(pathName):
     maxColone,listData = parseTestData(pathName)
